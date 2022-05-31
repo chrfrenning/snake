@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+      "sourceMap": true,
+      "target": "es6",
+      "module": "amd",
+      "allowJs": false,
+      "outDir": "./js"
+    },
+    "include": ["./src/**/*"]
+  }
