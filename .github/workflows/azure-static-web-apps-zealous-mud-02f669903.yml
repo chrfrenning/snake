@@ -16,6 +16,9 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
+      - name: TypeScript Build
+        id: tscbuild
+        uses: alexthemaster/action-build-typescript@v1.2.1
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
