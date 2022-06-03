@@ -78,8 +78,24 @@ export class Vector {
         return endpos;
     }
 
+    getPoint(index : number) : Point {
+        var p : Point = this.position.duplicate();
+        p.move(index, oppositeDirection(this.direction));
+        return p;
+    }
+
     move(distance : number, direction : Direction) : void {
         this.position.move(distance, direction);
+    }
+
+    getAllPoints() : Point[] {
+        var p : Point[] = [];
+
+        for ( var i = 0; i < this.length; i++ ) {
+            p.push(this.getPoint(i));
+        }
+
+        return p;
     }
 };
 

@@ -6,6 +6,7 @@ class State {
     model : Model;
     view : View;
     controller : Controller;
+    ws : WebSocket;
 }
 
 function keyboardHandler(event) : boolean {
@@ -40,6 +41,27 @@ function keyboardHandler(event) : boolean {
     return true;
 }
 
+function onWindowResize(this: Window, ev: UIEvent) : void {
+    var canvas : HTMLCanvasElement = document.querySelector('canvas');
+
+    canvas.width = this.innerWidth;
+    canvas.height = this.innerHeight;
+    document.body.style.overflow = "hidden";
+
+}
+
+async function connectToServer(state : State) {
+    state.ws = new WebSocket('ws://localhost:7000/ws');
+    return new Promise((resolve, reject) => {
+        const timer = setInterval(() => {
+            if (state.ws.readyState === 1) {
+                clearInterval(timer);
+                resolve(state.ws);
+            }
+        }, 10);
+    });
+}
+
 export function wireupGame(document) : void {
     console.log("Initializing Snake!");
     
@@ -49,9 +71,38 @@ export function wireupGame(document) : void {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    window.addEventListener('resize', onWindowResize, false);
+
     document.gameState.model = new Model();
     document.gameState.view = new View(document.gameState.model, canvas);
     document.gameState.controller = new Controller(document.gameState.model, document.gameState.view);
 
     document.addEventListener("keydown", keyboardHandler);
+
+    document.gameState.model.is_server_connected = true;
+    // connectToServer(document.gameState).then(e => {
+    //     var ws : WebSocket = e as WebSocket;
+    //     document.gameState.model.is_server_connected = true;
+
+    //     ws.onmessage = (msg) => {
+    //         console.log(msg);
+    //         const data = JSON.parse(msg.data);
+    //         switch( data.type ) {
+    //             case "howdy":
+    //                 document.gameState.model.setPlayerId(data.id);
+    //                 break;
+    //             case "update":
+    //                 document.gameState.model.updateSnake(data);
+    //                 break;
+    //             case "delete":
+    //                 document.gameState.model.deleteSnake(data);
+    //                 break;
+    //             default:
+    //                 console.log("Unknown message.");
+    //                 break;
+    //         }
+    //     };
+
+    //     ws.send( JSON.stringify({type : "hey"}) );
+    // });
 }

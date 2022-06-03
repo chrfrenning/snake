@@ -51,7 +51,7 @@ export class Controller {
     }
 
     step() : void {
-        this.m.getSnake().crawlOne();
+        
     }
 
     // random generator

@@ -36,7 +36,7 @@ export class View {
         ctx.font = "12px Roboto";
         ctx.strokeStyle = "#666666";
         ctx.fillStyle = "#666666";
-        var text = "Snake (c) christopher@frenning.com";
+        var text = "Retro Multiplayer Snake (c) c@chph.io  ";
         var metrics = ctx.measureText( text );
         ctx.fillText(text, (w - metrics.width - 10), (h - metrics.actualBoundingBoxAscent) );
     }
@@ -52,7 +52,15 @@ export class View {
                 } else {
                     context.fillStyle = "#FFFFFF";
                 }
+
                 context.fillRect(cell * cellwidth, row * cellheight, cellwidth, cellheight);
+
+                // paint cell coordinates for debugging
+                // context.font = "7px Roboto";
+                // context.fillStyle = "#666666";
+                // var text : string = row + "," + cell
+                // var metrics = context.measureText( text );
+                // context.fillText(text, (cell * cellwidth) + (cellwidth / 2) - (metrics.width / 2), (row * cellheight) + (cellheight / 2) + (metrics.actualBoundingBoxAscent / 2));
             }
         }
     }
