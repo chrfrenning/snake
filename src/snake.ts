@@ -62,15 +62,15 @@ function handleTouchMove(e) {
 
     if ( Math.abs(xDiff) > Math.abs(yDiff) ) {
         if ( xDiff > 0 ) {
-            document['gameState'].controller.right();
-        } else {
             document['gameState'].controller.left();
+        } else {
+            document['gameState'].controller.right();
         }
     } else {
         if ( yDiff > 0 ) {
-            document['gameState'].controller.down();
-        } else {
             document['gameState'].controller.up();
+        } else {
+            document['gameState'].controller.down();
         }
     }
 }
