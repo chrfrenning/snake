@@ -16,8 +16,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
-      - name: TypeScript Build
-        uses: alexthemaster/action-build-typescript@v1.2.1
       - name: deploy to swa
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -26,6 +24,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
           action: "upload"
           app_location: "/" # App source code path
+          app_build_command: tsc
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
