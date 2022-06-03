@@ -41,6 +41,40 @@ function keyboardHandler(event) : boolean {
     return true;
 }
 
+var xDown = null;
+var yDown = null;
+
+function handleTouchStart(e) {
+    const firstTouch = e.touches[0];
+    xDown = firstTouch.clientX;
+    yDown = firstTouch.clientY;
+}
+
+function handleTouchMove(e) {
+    if ( ! xDown || ! yDown )
+        return;
+
+    var xUp = e.touches[0].clientX;
+    var yUp = e.touches[0].clientY;
+
+    var xDiff = xDown - xUp;
+    var yDiff = yDown - yUp;
+
+    if ( Math.abs(xDiff) > Math.abs(yDiff) ) {
+        if ( xDiff > 0 ) {
+            document['gameState'].controller.right();
+        } else {
+            document['gameState'].controller.left();
+        }
+    } else {
+        if ( yDiff > 0 ) {
+            document['gameState'].controller.down();
+        } else {
+            document['gameState'].controller.up();
+        }
+    }
+}
+
 function onWindowResize(this: Window, ev: UIEvent) : void {
     var canvas : HTMLCanvasElement = document.querySelector('canvas');
 
@@ -78,6 +112,9 @@ export function wireupGame(document) : void {
     document.gameState.controller = new Controller(document.gameState.model, document.gameState.view);
 
     document.addEventListener("keydown", keyboardHandler);
+
+    document.addEventListener("touchstart", handleTouchStart, false);
+    document.addEventListener("touchmove", handleTouchMove, false);
 
     document.gameState.model.is_server_connected = true;
     // connectToServer(document.gameState).then(e => {
