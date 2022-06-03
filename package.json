@@ -1,4 +1,9 @@
 {
+  "name": "Snake",
+  "version": "0.1a",
+  "description": "Retro Snake Game",
+  "author": "christopher@frenning.com",
+  "license": "MIT",
   "devDependencies": {
     "typescript": "^4.6.4"
   }
