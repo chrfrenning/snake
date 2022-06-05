@@ -1,3 +1,4 @@
-balloonpop.js
-node_modules/
 js/
+.vscode/
+node_modules/
+balloonpop.js

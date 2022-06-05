@@ -1,12 +1,17 @@
 <!-- resolution 2532-1170 (2.164:1) iphone 13 std -->
 <html>
     <head>
-        <title>Retro Snake Game - Free and No Ads</title>
+        <title>Gangeslange - øv på gangetabellen - gratis og ingen annonser</title>
         <script type="text/javascript" src="require.js"></script>
         <link href="styles.css" rel="stylesheet" type="text/css" media="all">
     </head>
     <body>
-        <canvas width="800" height="450"></canvas>
+        <h1>Gangeslange</h1>
+        <h2 id="question">Hva er <span id="factor1">2</span>x<span id="factor2">2</span>?</h2>
+        <p>For å løse oppgaven, gå innom ruten som inneholder svaret, da vil slangen vokse!</p>
+        <p>Husk at svaret kan finnes to steder. Etter noen sekunder får du et hint!</p>
+        <canvas width="600" height="600"></canvas>
+        
 
         <script>
             require.config( {baseUrl: './js/'} );
