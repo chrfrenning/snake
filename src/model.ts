@@ -59,6 +59,7 @@ export class GameObject {
 
 export class Food extends GameObject {
     nutritionalValue : number = 1;
+    age : number = 0;
 
     constructor(world : World, position : Point) {
         super(world);
@@ -67,11 +68,14 @@ export class Food extends GameObject {
     }
 
     draw(view : View, context : CanvasRenderingContext2D) : void {
-        context.save();
-        context.translate(this.position.x * view.getCellWidth(), this.position.y * view.getCellHeight());
-        context.fillStyle = this.nutritionalValue > 0 ? "#00ff00" : "#aaaaaa";
-        context.fillRect(0, 0, view.getCellWidth(), view.getCellHeight());
-        context.restore();
+        // only draw the food if the age is more than 40
+        if ( this.age > 15 ) {
+            context.save();
+            context.translate(this.position.x * view.getCellWidth(), this.position.y * view.getCellHeight());
+            context.fillStyle = this.nutritionalValue > 0 ? "#00ff00" : "#aaaaaa";
+            context.fillRect(0, 0, view.getCellWidth(), view.getCellHeight());
+            context.restore();
+        }
     }
 
     eat() : number {
@@ -79,6 +83,10 @@ export class Food extends GameObject {
         this.nutritionalValue = 0;
         this.is_thrash = true;
         return value;
+    }
+
+    bigTick(worldMap: GameObject[][]): void {
+        this.age++;
     }
 };
 
@@ -175,15 +183,16 @@ export class Snake extends GameObject {
                 this.setDirty();
                 return;
             } else if ( worldMap[pos.y][pos.x] instanceof Snake ) {
-                // this.is_dead = true;
-                // this.setDirty();
-                // return;
+                this.is_dead = true;
+                this.setDirty();
+                return;
             } else if ( worldMap[pos.y][pos.x] instanceof Food ) {
                 this.foodEaten++;
 
                 var food : Food = worldMap[pos.y][pos.x] as Food;
                 food.eat();
-
+                
+                this.world.removeAllFood(); // we have two foods for each multiplication question
                 this.world.addNewFood(worldMap);
                 this.setDirty();
             }
@@ -230,11 +239,14 @@ export class Snake extends GameObject {
 }
 
 export class World {
-    width : number = 64;
-    height : number = 64;
+    width : number = 10;
+    height : number = 10;
 
     objects : GameObject[] = [];
     mysnake : Snake;
+
+    factor1 : number = 0;
+    factor2 : number = 0;
 
     createMap() : GameObject[][] {
         var map : GameObject[][] = [];
@@ -264,56 +276,20 @@ export class World {
             var pos : Point = new Point(Math.floor(Math.random() * this.width), Math.floor(Math.random() * this.height));
             if ( worldMap[pos.y][pos.x] == null ) {
                 this.objects.push(new Food(this, pos));
+                this.factor1 = pos.x + 1;
+                this.factor2 = pos.y + 1;
+
+                this.objects.push(new Food(this, new Point(pos.y, pos.x)));
+
+                document.getElementById("factor1").innerHTML = this.factor1.toString();
+                document.getElementById("factor2").innerHTML = this.factor2.toString();
                 return;
             }
         }
     }
 
-    convertSnakeToFood(snake : Snake) : void {
-        // snake.parts.forEach( part => {
-        //     part.getAllPoints().forEach( p => {
-        //         this.objects.push(new Food(this, p));
-        //     });
-        // } );
-    }
-
-    updateSnake(snakeMessage) {
-        this.objects.forEach( o => {
-            if ( o instanceof Snake ) {
-                var s : Snake = o as Snake;
-
-                if ( s.id == snakeMessage.id ) {
-                    s.parts = [];
-                    snakeMessage.vectors.forEach( p => {
-                        var pt : Point = new Point( p.position.x, p.position.y );
-                        var v : Vector = new Vector( pt, p.length, p.direction );
-                        s.parts.push(v);
-                    });
-                    s.is_dead = !snakeMessage.alive;
-                    if ( s.is_dead )
-                        s.is_thrash = true;
-
-                    s.setDirty();
-                    return; // we're done
-                }
-            }
-        });
-
-        // wasn't found, insert it
-        if ( !snakeMessage.alive )
-            return;
-            
-        var newSnake = new Snake(this);
-        newSnake.id = snakeMessage.id;
-        newSnake.is_dead = false;
-        snakeMessage.vectors.forEach( p => {
-            var pt : Point = new Point( p.position.x, p.position.y );
-            var v : Vector = new Vector( pt, p.length, p.direction );
-            newSnake.parts.push(v);
-        });
-        newSnake.setDirty();
-        
-        this.objects.push(newSnake);
+    removeAllFood() : void {
+        this.objects = this.objects.filter( o => !(o instanceof Food) );
     }
 };
 
@@ -323,18 +299,13 @@ export class Model {
     world : World = new World();
     points : number = 0;
     is_dirty : boolean = true;
-    is_server_connected : boolean = false;
-    player_id : string;
     
     constructor() {
         this.world.mysnake = new Snake(this.world);
         this.world.objects.push(this.world.mysnake);
-        var foodpos = this.world.mysnake.parts[0].getStartPoint().duplicate();
+        this.world.addNewFood(this.world.createMap());
 
-        foodpos.move(10, this.world.mysnake.nextDirection);
-        this.world.objects.push(new Food(this.world, foodpos));
-
-        this.setupWalls();
+        //this.setupWalls(); // not using walls in gangeslange
     }
 
     setupWalls() : void {
@@ -394,40 +365,7 @@ export class Model {
     }
 
     bigTick() : void {
-        if ( !this.is_server_connected ) return;
-
         var worldMap : GameObject[][] = this.world.createMap();
         this.world.objects.forEach( e => e.bigTick(worldMap) );
-
-        if ( this.isDirty() ) {
-            // Disabling multiplayer stuff
-            // var ws : WebSocket = document['gameState'].ws;
-            // var msg = { type: "snakeupdate", vectors: this.getSnake().parts, alive: !this.getSnake().is_dead };
-            // ws.send(JSON.stringify(msg));
-        }
-    }
-
-    updateSnake(data) : void {
-        if ( data.id == this.player_id )
-            return;
-
-        this.world.updateSnake(data);
-        this.setDirty();
-    }
-
-    deleteSnake(data) : void {
-        if ( data.id == this.player_id )
-            return;
-
-        this.world.objects.forEach( o => {
-            if ( o instanceof Snake && o.id == data.id ) {
-                o.is_thrash = true;
-            }
-        });
-        this.setDirty();
-    }
-
-    setPlayerId(id : string) : void {
-        this.player_id = id;
     }
 };

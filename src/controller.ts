@@ -29,7 +29,7 @@ export class Controller {
 
         setInterval(() => {
             this.m.bigTick();
-        }, 1000 / 5);
+        }, 1000 / 2);
     }
 
     // keyboard commands

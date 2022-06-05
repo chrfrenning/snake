@@ -102,10 +102,10 @@ export function wireupGame(document) : void {
     document.gameState = new State();
 
     var canvas : HTMLCanvasElement = document.querySelector('canvas');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    // canvas.width = window.innerWidth;
+    // canvas.height = window.innerHeight;
 
-    window.addEventListener('resize', onWindowResize, false);
+    // window.addEventListener('resize', onWindowResize, false);
 
     document.gameState.model = new Model();
     document.gameState.view = new View(document.gameState.model, canvas);
