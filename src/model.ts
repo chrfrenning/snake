@@ -58,7 +58,7 @@ export class GameObject {
 };
 
 export class Food extends GameObject {
-    nutritionalValue : number = 1;
+    nutritionalValue : number = 3;
 
     constructor(world : World, position : Point) {
         super(world);
@@ -179,10 +179,8 @@ export class Snake extends GameObject {
                 // this.setDirty();
                 // return;
             } else if ( worldMap[pos.y][pos.x] instanceof Food ) {
-                this.foodEaten++;
-
                 var food : Food = worldMap[pos.y][pos.x] as Food;
-                food.eat();
+                this.foodEaten += food.eat();
 
                 this.world.addNewFood(worldMap);
                 this.setDirty();
